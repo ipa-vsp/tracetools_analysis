@@ -91,6 +91,9 @@ class Ros2Handler(EventHandler):
                 self._handle_rcl_lifecycle_state_machine_init,
             'ros2:rcl_lifecycle_transition':
                 self._handle_rcl_lifecycle_transition,
+            # For ros2_canopen
+            'ros2:canopen_tpdo_data':
+                self._handle_canopen_tpdo_data,
         }
         super().__init__(
             handler_map=handler_map,
@@ -337,3 +340,14 @@ class Ros2Handler(EventHandler):
         start_label = get_field(event, 'start_label')
         goal_label = get_field(event, 'goal_label')
         self.data.add_lifecycle_state_transition(state_machine, start_label, goal_label, timestamp)
+    
+    # For ros2_canopen
+    def _handle_canopen_tpdo_data(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        timestamp = metadata.timestamp
+        node_id = get_field(event, "node_id")
+        index = get_field(event, "index")
+        subindex = get_field(event, "subindex")
+        data = get_field(event, "data")
+        self.data.add_canopen_tpdo_data(timestamp, node_id, index, subindex, data)

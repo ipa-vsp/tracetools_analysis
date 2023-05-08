@@ -56,6 +56,8 @@ class Ros2DataModel(DataModel):
         self._rclcpp_take_instances: DataModelIntermediateStorage = []
         self._callback_instances: DataModelIntermediateStorage = []
         self._lifecycle_transitions: DataModelIntermediateStorage = []
+        # For ros2_canopen
+        self._canopen_tpdo_data: DataModelIntermediateStorage = []
 
     def add_context(
         self, context_handle, timestamp, pid, version
@@ -268,6 +270,18 @@ class Ros2DataModel(DataModel):
             'goal_label': goal_label,
             'timestamp': timestamp,
         })
+    
+    # For ros2_canopen
+    def add_canopen_tpdo_data(
+        self, timestamp, node_id, index, subindex, data
+    ) -> None:
+        self._canopen_tpdo_data.append({
+            'timestamp' : timestamp,
+            'node_id' : node_id,
+            'index' : index,
+            'subindex' : subindex,
+            'data' : data,
+        })
 
     def _finalize(self) -> None:
         # Some of the lists of dicts might be empty, and setting
@@ -323,6 +337,8 @@ class Ros2DataModel(DataModel):
         self.rclcpp_take_instances = pd.DataFrame.from_dict(self._rclcpp_take_instances)
         self.callback_instances = pd.DataFrame.from_dict(self._callback_instances)
         self.lifecycle_transitions = pd.DataFrame.from_dict(self._lifecycle_transitions)
+        # For ros2_canopen
+        self.canopen_tpdo_data = pd.DataFrame.from_dict(self._canopen_tpdo_data)
 
     def print_data(self) -> None:
         print('====================ROS 2 DATA MODEL===================')
@@ -391,4 +407,7 @@ class Ros2DataModel(DataModel):
         print()
         print('Lifecycle transitions:')
         print(self.lifecycle_transitions.to_string())
+        # For ros2_canopen
+        print('ROS2 CANopen tracing data:')
+        print(self.canopen_tpdo_data.to_string())
         print('==================================================')
