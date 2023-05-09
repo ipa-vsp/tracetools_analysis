@@ -94,6 +94,8 @@ class Ros2Handler(EventHandler):
             # For ros2_canopen
             'ros2:canopen_tpdo_data':
                 self._handle_canopen_tpdo_data,
+            'ros2:canopen_ros2_control_target_position':
+                self._handle_canopen_ros2_control_target_position,
         }
         super().__init__(
             handler_map=handler_map,
@@ -346,8 +348,16 @@ class Ros2Handler(EventHandler):
         self, event: Dict, metadata: EventMetadata,
     ) -> None:
         timestamp = metadata.timestamp
+        name = get_field(event, "name")
         node_id = get_field(event, "node_id")
-        index = get_field(event, "index")
-        subindex = get_field(event, "subindex")
         data = get_field(event, "data")
-        self.data.add_canopen_tpdo_data(timestamp, node_id, index, subindex, data)
+        self.data.add_canopen_tpdo_data(timestamp, name, node_id, data)
+    
+    def _handle_canopen_ros2_control_target_position(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        timestamp = metadata.timestamp
+        name = get_field(event, "name")
+        node_id = get_field(event, "node_id")
+        data = get_field(event, "data")
+        self.data.add_canopen_ros2_control_target_position(timestamp, name, node_id, data)

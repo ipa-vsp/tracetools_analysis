@@ -58,6 +58,7 @@ class Ros2DataModel(DataModel):
         self._lifecycle_transitions: DataModelIntermediateStorage = []
         # For ros2_canopen
         self._canopen_tpdo_data: DataModelIntermediateStorage = []
+        self._canopen_ros2_control_target_position: DataModelIntermediateStorage = []
 
     def add_context(
         self, context_handle, timestamp, pid, version
@@ -273,13 +274,22 @@ class Ros2DataModel(DataModel):
     
     # For ros2_canopen
     def add_canopen_tpdo_data(
-        self, timestamp, node_id, index, subindex, data
+        self, timestamp, name, node_id, data
     ) -> None:
         self._canopen_tpdo_data.append({
             'timestamp' : timestamp,
+            'name' : name,
             'node_id' : node_id,
-            'index' : index,
-            'subindex' : subindex,
+            'data' : data,
+        })
+    
+    def add_canopen_ros2_control_target_position(
+        self, timestamp, name, node_id, data   
+    ) -> None:
+        self._canopen_ros2_control_target_position.append({
+            'timestamp' : timestamp,
+            'name' : name,
+            'node_id' : node_id,
             'data' : data,
         })
 
@@ -339,75 +349,78 @@ class Ros2DataModel(DataModel):
         self.lifecycle_transitions = pd.DataFrame.from_dict(self._lifecycle_transitions)
         # For ros2_canopen
         self.canopen_tpdo_data = pd.DataFrame.from_dict(self._canopen_tpdo_data)
+        self.canopen_ros2_control_target_position = pd.DataFrame.from_dict(self._canopen_ros2_control_target_position)
 
     def print_data(self) -> None:
         print('====================ROS 2 DATA MODEL===================')
-        print('Contexts:')
-        print(self.contexts.to_string())
-        print()
-        print('Nodes:')
-        print(self.nodes.to_string())
-        print()
-        print('Publishers (rmw):')
-        print(self.rmw_publishers.to_string())
-        print()
-        print('Publishers (rcl):')
-        print(self.rcl_publishers.to_string())
-        print()
-        print('Subscriptions (rmw):')
-        print(self.rmw_subscriptions.to_string())
-        print()
-        print('Subscriptions (rcl):')
-        print(self.rcl_subscriptions.to_string())
-        print()
-        print('Subscription objects:')
-        print(self.subscription_objects.to_string())
-        print()
-        print('Services:')
-        print(self.services.to_string())
-        print()
-        print('Clients:')
-        print(self.clients.to_string())
-        print()
-        print('Timers:')
-        print(self.timers.to_string())
-        print()
-        print('Timer-node links:')
-        print(self.timer_node_links.to_string())
-        print()
-        print('Callback objects:')
-        print(self.callback_objects.to_string())
-        print()
-        print('Callback symbols:')
-        print(self.callback_symbols.to_string())
-        print()
-        print('Callback instances:')
-        print(self.callback_instances.to_string())
-        print()
-        print('Publish instances (rclcpp):')
-        print(self.rclcpp_publish_instances.to_string())
-        print()
-        print('Publish instances (rcl):')
-        print(self.rcl_publish_instances.to_string())
-        print()
-        print('Publish instances (rmw):')
-        print(self.rmw_publish_instances.to_string())
-        print()
-        print('Take instances (rmw):')
-        print(self.rmw_take_instances.to_string())
-        print()
-        print('Take instances (rcl):')
-        print(self.rcl_take_instances.to_string())
-        print()
-        print('Take instances (rclcpp):')
-        print(self.rclcpp_take_instances.to_string())
-        print()
-        print('Lifecycle state machines:')
-        print(self.lifecycle_state_machines.to_string())
-        print()
-        print('Lifecycle transitions:')
-        print(self.lifecycle_transitions.to_string())
+        # print('Contexts:')
+        # print(self.contexts.to_string())
+        # print()
+        # print('Nodes:')
+        # print(self.nodes.to_string())
+        # print()
+        # print('Publishers (rmw):')
+        # print(self.rmw_publishers.to_string())
+        # print()
+        # print('Publishers (rcl):')
+        # print(self.rcl_publishers.to_string())
+        # print()
+        # print('Subscriptions (rmw):')
+        # print(self.rmw_subscriptions.to_string())
+        # print()
+        # print('Subscriptions (rcl):')
+        # print(self.rcl_subscriptions.to_string())
+        # print()
+        # print('Subscription objects:')
+        # print(self.subscription_objects.to_string())
+        # print()
+        # print('Services:')
+        # print(self.services.to_string())
+        # print()
+        # print('Clients:')
+        # print(self.clients.to_string())
+        # print()
+        # print('Timers:')
+        # print(self.timers.to_string())
+        # print()
+        # print('Timer-node links:')
+        # print(self.timer_node_links.to_string())
+        # print()
+        # print('Callback objects:')
+        # print(self.callback_objects.to_string())
+        # print()
+        # print('Callback symbols:')
+        # print(self.callback_symbols.to_string())
+        # print()
+        # print('Callback instances:')
+        # print(self.callback_instances.to_string())
+        # print()
+        # print('Publish instances (rclcpp):')
+        # print(self.rclcpp_publish_instances.to_string())
+        # print()
+        # print('Publish instances (rcl):')
+        # print(self.rcl_publish_instances.to_string())
+        # print()
+        # print('Publish instances (rmw):')
+        # print(self.rmw_publish_instances.to_string())
+        # print()
+        # print('Take instances (rmw):')
+        # print(self.rmw_take_instances.to_string())
+        # print()
+        # print('Take instances (rcl):')
+        # print(self.rcl_take_instances.to_string())
+        # print()
+        # print('Take instances (rclcpp):')
+        # print(self.rclcpp_take_instances.to_string())
+        # print()
+        # print('Lifecycle state machines:')
+        # print(self.lifecycle_state_machines.to_string())
+        # print()
+        # print('Lifecycle transitions:')
+        # print(self.lifecycle_transitions.to_string())
         # For ros2_canopen
-        print('ROS2 CANopen tracing data:')
+        print('ROS2 CANopen tracing tpdo data:')
         print(self.canopen_tpdo_data.to_string())
+        print('ROS2 CANopen Joint Values trace:')
+        print(self.canopen_ros2_control_target_position.to_string())
         print('==================================================')
